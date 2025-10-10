@@ -71,6 +71,8 @@ We do need to disable backface culling in the graphics pipeline so we can see al
 
 <img width="440" height="42" alt="image" src="https://github.com/user-attachments/assets/d1414af3-0684-44cf-9db1-26dbae44b2e4" />
 
+The cube renders:
+
 <img width="534" height="486" alt="image" src="https://github.com/user-attachments/assets/92351d69-326d-44f6-8d3c-ff8c047fe613" />
 
 # Exercise 4 - Wireframe Rendering
@@ -78,6 +80,7 @@ We do need to disable backface culling in the graphics pipeline so we can see al
 If we change the rasterizer's ```polygoneMode``` to ```VK_POLYGON_MODE_LINE```, it will show only the edges of the cube.
 
 <img width="515" height="42" alt="image" src="https://github.com/user-attachments/assets/f472292a-b4ad-4234-b720-f5e7dc2b4653" />
+
 
 <img width="550" height="483" alt="image" src="https://github.com/user-attachments/assets/4f434241-da49-4bc0-aa7a-a907ca5cbd3e" />
 
@@ -116,5 +119,38 @@ We also need to change the graphic pipeline's topology to ```VK_PRIMITIVE_TOPOLO
 The cube now renders in one efficient draw call:
 
 <img width="445" height="469" alt="image" src="https://github.com/user-attachments/assets/43f089c8-3132-4dc6-93d2-c058089ec3dd" />
+
+# Exercise 8 - Drawing multiple cubes using instanced drawing
+
+To use instanced drawing, we edit the parameters of the ```vkCmdDrawIndexed``` to define an instance count of 2:
+
+<img width="973" height="49" alt="image" src="https://github.com/user-attachments/assets/00aeab72-2f8f-4e97-b1d6-939e9213de53" />
+
+We then edit the vertex shader, to allow it to use the instance index variable to translate each cube differently:
+
+<img width="963" height="319" alt="image" src="https://github.com/user-attachments/assets/9650fae1-c53b-43e2-825b-ac92a9bd5279" />
+
+The first cube, with instance index 0 is translated (-0.75, 0, 0) and the second cube with instance index 1 is translated (0.75, 0, 0):
+
+<img width="786" height="595" alt="image" src="https://github.com/user-attachments/assets/0991212a-8cca-49fc-8bfe-0958c0c3bfea" />
+
+# Exercise 9 - Drawing two cubes using push constants
+
+We use push constants to send a small, limited amount of data to the shaders during the recording of the command buffer - so we can change the model matrix without extra overhead.
+
+First, we update the vertex shader to take the model matrix as a push constant:
+
+<img width="607" height="215" alt="image" src="https://github.com/user-attachments/assets/c5022deb-a95e-489f-ad4a-6bbd4b442b76" />
+
+Then, we update the structs in in the main program to send the model matrix as a push constant:
+
+<img width="411" height="218" alt="image" src="https://github.com/user-attachments/assets/70719088-479b-4390-9d3f-f539ea4dfd1d" />
+
+Next, when creating the graphics pipeline, we modify the graphics pipeline to tell Vulkan about the push constant range:
+
+<img width="843" height="289" alt="image" src="https://github.com/user-attachments/assets/f7adf755-900d-4962-a444-9f4d9eda1393" />
+
+Finally, when recording the command buffer, we can send 2 draw calls, pushing a different model matrix to the shader for each one:
+
 
 
