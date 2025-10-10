@@ -152,5 +152,12 @@ Next, when creating the graphics pipeline, we modify the graphics pipeline to te
 
 Finally, when recording the command buffer, we can send 2 draw calls, pushing a different model matrix to the shader for each one:
 
+<img width="1358" height="296" alt="image" src="https://github.com/user-attachments/assets/fad4def5-0bf6-4fb4-bf81-04ccc1985114" />
 
+The result is that we get 2 cubes, translated differently using push constants:
 
+<img width="791" height="599" alt="image" src="https://github.com/user-attachments/assets/efecfd12-439d-4708-9981-8e4686d91547" />
+
+# Reflection
+
+This lab has helped me to start to understand the core architecture of Vulkan and how to use it to effectively create and manipulate simple meshes with 3D geometric primitives, using vertex buffers, index buffers, instanced drawing and push constants.
