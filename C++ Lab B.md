@@ -226,7 +226,7 @@ Using these payloads, I obtained the following timing data:
 
 ### Q: How do range-based loops compare in performance to standard loops?
 
-I'm executing the following pseudocode:
+This is the pseudocode that they will be executing:
 
 ```
 values = 100-long vector of ints containing "8"
@@ -261,3 +261,29 @@ This gave the following timing data:
 | Range-based | 693    | 712.691 |
 
 #### My expectation was that the range-based loop was going to take longer, because values need to be copied over from the original vector in order to used in the range-based loop. It is clear from the timing results, that these code snippets have each compiled into equivalent assembly, so my expectations have not been met. I think this is because the payload being executed was too simple and perhaps the compiler was able to take note of and optimise the use of the range-based loop.
+
+## Exercise 7 - Architecture
+
+To compare x64 architecture to x86 architecture, I'm going to re-do the conditional and nested loop exercises, producing x86 code:
+
+| Conditional | Median | Mean    |
+|-------------|--------|---------|
+| if          | 99     | 115.598 |
+| switch      | 99     | 113.156 |
+| ?           | 165    | 158.872 |
+| if (x86)    | 396    | 405.464 |
+| switch (x86)| 396    | 404.697 |
+| ? (x86)     | 165    | 173.805 |
+
+| Exit Method | Median | Mean    |
+|-------------|--------|---------|
+| Method 1    | 2343   | 2342.43 |
+| Method 2    | 4323   | 4342.69 |
+| Method 3    | 4323   | 4336.65 |
+| Method 4    | 4323   | 4351.70 |
+| Method 1 (x86  | 4125   | 4277.01 |
+| Method 2 (x86) | 7854   | 8385.54 |
+| Method 3 (x86) | 7854   | 8545.22 |
+| Method 4 (x86) | 7854   | 9851.99 |
+
+#### With the exception of the ternary conditional operator ```?```, everything executed significantly slower when running in x86 mode. In my view, this is because the fundamental characteristics of x86 (i.e. access to fewer registers, which necessitate more regular cache access) mean that particular fundamental actions simply take more CPU cycles to be fully executed in an x86 context, thus explaining the across-the-board execution penalty for using x86.
