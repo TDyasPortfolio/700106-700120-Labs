@@ -110,3 +110,24 @@ The timing program identified that the ```if``` and ```switch``` operators took 
 
 #### I think that this discrepancy shows that the ```if``` and ```switch``` operators compiled down into approximately the same assembly code, giving the same median performance with small variation in mean execution time due to random noise. I think the ternary operator ```?``` took noticeably longer because it compiled differently into assembly, and the assembly produced was less efficient for this example. 
 
+## Exercise 4 - Branch Prediction
+
+### Q: Demonstrate when branch prediction is working well and when it isn't
+
+The CPU did effective branch prediction in the previous examples because they worked cyclically - as the loop goes on, x alternates between 0, 1 and 2 repeatedly, so the loop always went down the first branch, then the second branch, then the third branch. However, if we introduce an element of randomness, the branch outcomes will be essentially unpredictable, so the predictor will fail often, creating extra work and significantly slowing down the execution of the payload:
+
+```c++
+for (auto j = 0; j < 20; j++) {
+	auto const x = rand() % 3;
+	if (x == 0) { dummyX += 10; }
+	else if (x == 1) { dummyX += 20; }
+	else { dummyX += 30; }
+}
+```
+
+Compared to the previous ```if``` example, the execution was much slower as expected, because of the significantly lower rate of accurate branch predictions (and the small amount of overhead associated with the random number generator):
+
+| Branch Prediction | Median | Mean    |
+|-------------------|--------|---------|
+| Accurate          | 99     | 115.598 |
+| Random            | 2277   | 2281.32 |
