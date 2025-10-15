@@ -221,3 +221,43 @@ Using these payloads, I obtained the following timing data:
 | Method 4    | 4323   | 4351.70 |
 
 #### The results tells us that methods 2, 3 and 4 have all compiled into basically the same assembly, hence their identical medians and approximately equal means. In my opinion, this tells us that in method 1, the compiler has noticed that the conditions on both loops will immediately be broken if ```found``` is ever set to True, and has optimised around it. The results suggest that you should seek to use method 1, because it is the fastest of the 4.
+
+## Exercise 6 - Range-based loops
+
+### Q: How do range-based loops compare in performance to standard loops?
+
+I'm executing the following pseudocode:
+
+```
+values = 100-long vector of ints containing "8"
+loop through and add every element of values to dummyX
+```
+
+As a standard loop:
+
+```c++
+const auto loops = 100;
+std::vector<int> values(loops, 8);
+for (auto j = 0; j < loops; j++) {
+	dummyX += values[j];
+}
+```
+
+As a range-based loop:
+
+```c++
+const auto loops = 100;
+std::vector<int> values(loops, 8);
+for (auto value : values) {
+	dummyX += value;
+}
+```
+
+This gave the following timing data:
+
+| Loop        | Median | Mean    |
+|-------------|--------|---------|
+| Standard    | 693    | 711.060 |
+| Range-based | 693    | 712.691 |
+
+#### My expectation was that the range-based loop was going to take longer, because values need to be copied over from the original vector in order to used in the range-based loop. It is clear from the timing results, that these code snippets have each compiled into equivalent assembly, so my expectations have not been met. I think this is because the payload being executed was too simple and perhaps the compiler was able to take note of and optimise the use of the range-based loop.
