@@ -131,3 +131,93 @@ Compared to the previous ```if``` example, the execution was much slower as expe
 |-------------------|--------|---------|
 | Accurate          | 99     | 115.598 |
 | Random            | 2277   | 2281.32 |
+
+## Exercise 5 - Nested Loops
+
+### Q: Compare the 4 different methods of exiting a nested loop.
+
+This is the pseudocode they will be executing:
+
+```
+loops = 100
+for j in 0 -> loops
+	for k in 0 -> loops
+		if j * k = 1533 (j = 21, k = 73)
+			add 1 to dummyX and exit loop 
+```
+
+Method 1 - Each condition section of the loops has two conditions, for the loop control and the exit condition:
+
+```c++
+const auto loops = 100;
+bool found = false;
+for (auto j = 0; j < loops && !found; j++) {
+	for (auto k = 0; k < loops && !found; k++) {
+		if (j * k == 1533) {
+			dummyX += 1;
+			found = true;
+		}
+	}
+}
+```
+
+Method 2 - An additional if statement immediately after the inner loop to catch and propogate a break statement:
+
+```c++
+const auto loops = 100;
+bool found = false;
+for (auto j = 0; j < loops; j++) {
+	for (auto k = 0; k < loops; k++) {
+		if (j * k == 1533) {
+			dummyX += 1;
+			found = true;
+			break;
+		}
+	}
+	if (found) break;
+}
+```
+
+Method 3 - A goto statement in the inner loop:
+
+```c++
+const auto loops = 100;
+for (auto j = 0; j < loops; j++) {
+	for (auto k = 0; k < loops; k++) {
+		if (j * k == 1533) {
+			dummyX += 1;
+			goto end_of_loops;
+		}
+	}
+}
+end_of_loops:
+```
+
+Method 4 - A return statement in a lambda function:
+
+```c++
+const auto loops = 100;
+auto lambdaLoop = [&]() {
+	for (auto j = 0; j < loops; j++) {
+		for (auto k = 0; k < loops; k++) {
+			if (j * k == 1533) {
+				dummyX += 1;
+				return true;
+			}
+		}
+	}
+	return false;
+};
+auto dummyY = lambdaLoop();
+```
+
+Using these payloads, I obtained the following timing data:
+
+| Exit Method | Median | Mean    |
+|-------------|--------|---------|
+| Method 1    | 2343   | 2342.43 |
+| Method 2    | 4323   | 4342.69 |
+| Method 3    | 4323   | 4336.65 |
+| Method 4    | 4323   | 4351.70 |
+
+#### The results tells us that methods 2, 3 and 4 have all compiled into basically the same assembly, hence their identical medians and approximately equal means. In my opinion, this tells us that in method 1, the compiler has noticed that the conditions on both loops will immediately be broken if ```found``` is ever set to True, and has optimised around it. The results suggest that you should seek to use method 1, because it is the fastest of the 4.
