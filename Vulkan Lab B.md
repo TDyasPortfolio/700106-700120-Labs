@@ -72,5 +72,17 @@ void loadModel() {
 
 ## Exercise 4 - Create a resuable geometry utility
 
+I created the class MeshHelper with grid and cylinder functions which can cumulatively add meshes to the same vertices and indices vectors as before to render multiple objects:
+
+<img width="901" height="350" alt="image" src="https://github.com/user-attachments/assets/be943d5e-fa68-4b6c-9d4d-272a7838face" />
+
+<img width="791" height="638" alt="image" src="https://github.com/user-attachments/assets/bf42c3c0-b3e4-4466-9ee0-c392d8658933" />
 
 ## Exercise 5 - Load external models with Assimp
+
+I wrote a function in my MeshHelper class which can import an OBJ model from a filename and add its vertices and indices to the vectors to be rendered:
+
+<img width="1166" height="395" alt="image" src="https://github.com/user-attachments/assets/073cf467-8f22-478a-88b0-32a6a9c2f554" />
+
+<img width="806" height="633" alt="image" src="https://github.com/user-attachments/assets/41668dac-29c3-4ad1-a155-f162da59e149" />
+
