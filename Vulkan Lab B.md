@@ -20,6 +20,54 @@ This created elevation changes in the grid:
 
 ## Exercise 3 - Procedurally generate a cylinder
 
+I wrote the following function to generate a cylinder, which:
+ - Generates 2 circles in a for loop, each composed of ```int resolution``` number of vertices
+ - Generates the vertices for the centers of the top and bottom caps
+ - Uses triangle strips to create the caps with the top and bottom vertices
+ - Uses triangle strips to draw the walls between the top and bottom vertices
+
+```c++
+void createCylinder(float radius, float height, int resolution, std::vector<Vertex>& outVertices, std::vector<uint16_t>& outIndices) {
+    const auto twoPi = 4 * acos(0.0);
+    for (auto w = 0; w < resolution; w++) {
+        Vertex vt, vb;
+        vt.pos = glm::vec3((radius * cos((twoPi / resolution) * w)), (radius * sin((twoPi / resolution) * w)), height);
+        vb.pos = glm::vec3((radius * cos((twoPi / resolution) * w)), (radius * sin((twoPi / resolution) * w)), 0);
+        vb.color = vt.color = glm::vec3(1);
+        outVertices.push_back(vt);
+        outVertices.push_back(vb);
+    }
+    Vertex centerTop(glm::vec3(0, 0, height), glm::vec3(1));
+    outVertices.push_back(centerTop);
+    auto topCenterIndex = outVertices.size() - 1;
+    Vertex centerBottom(glm::vec3(0, 0, 0), glm::vec3(1));
+    outVertices.push_back(centerBottom);
+    auto bottomCenterIndex = outVertices.size() - 1;
+    for (auto w = 0; w < resolution; w++) {
+        auto next = (w + 1) % resolution;
+        outIndices.push_back(w * 2);
+        outIndices.push_back(next * 2);
+        outIndices.push_back(topCenterIndex);
+        outIndices.push_back(0xFFFF);
+        outIndices.push_back(w * 2 + 1);
+        outIndices.push_back(next * 2 + 1);
+        outIndices.push_back(bottomCenterIndex);
+        outIndices.push_back(0xFFFF);
+    }
+    for (auto w = 0; w <= resolution; w++) {
+        auto next = (w % resolution) * 2;
+        auto bottom = next + 1;
+        outIndices.push_back(next);
+        outIndices.push_back(bottom);
+    }
+}
+
+void loadModel() {
+    createCylinder(0.5, 0.5, 20, vertices, indices);
+}
+```
+
+<img width="792" height="632" alt="image" src="https://github.com/user-attachments/assets/1bf7e097-aea6-4b97-830a-289ecbdff8b4" />
 
 
 ## Exercise 4 - Create a resuable geometry utility
