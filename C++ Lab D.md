@@ -164,3 +164,126 @@ std::string printObjects(std::vector<Object> objects) {
 This program successfully parses the two objects in ```cubes.obj``` and is able to output ```Cube``` and ```Cube.001``` separately:
 
 <img width="1899" height="555" alt="image" src="https://github.com/user-attachments/assets/ae93a73a-faaa-4c19-93f7-8eb84ff200e6" />
+
+## Exercise 3 - Tuples
+
+### Q: Wrap your object parser within a new function, which takes only the file name as a parameter, and returns a tuple containing the size of the largest object and the level of the largest object.
+
+I got quite confused by the terminology used in this exercise, and I could not find any explanations in the taught material, so there are a number of assumptions I made in order to implement this idea:
+
+- The **largest** object is the one with the most vertices
+- Thus, returning the size of this object means returning the number of vertices
+- I did not know what the **level** of the object refers to, so I took it to mean "the number of **faces**"
+
+As a result, I wrote a function which parses the text file, keeping track of the number of vertices/faces in the current object, and also the number of vertices and faces in the largest object, outputting the larget as part of a tuple. It returns a value of (0, 0) if there is an error opening the file:
+
+```c++
+std::tuple<int, int> tupleParser(std::string filename) {
+	std::ifstream fin(filename);
+	if (!fin) {
+		return std::make_tuple(0, 0);
+	}
+
+	auto currentVertices = 0; 
+	auto currentFaces = 0;
+	auto bestVertices = 0;
+	auto bestFaces = 0;
+	auto currentBiggest = false;
+
+	std::vector<Object> objects;
+	Object currentObject;
+	std::string tag;
+	while (fin >> tag) {
+		if (tag == "o") {
+			if (!currentObject.name.empty()) {
+				currentBiggest = false;
+				objects.push_back(currentObject);
+				currentObject = Object();
+				currentVertices = 0;
+				currentFaces = 0;
+			}
+			fin >> currentObject.name;
+		}
+		else if (tag == "v") {
+			Vertex v;
+			fin >> v.x >> v.y >> v.z;
+			currentObject.vertices.push_back(v);
+			currentVertices++;
+			if (currentVertices > bestVertices) {
+				currentBiggest = true;
+			}
+		}
+		else if (tag == "vt") {
+			Texture t;
+			fin >> t.u >> t.v;
+			currentObject.textures.push_back(t);
+		}
+		else if (tag == "vn") {
+			Normal n;
+			fin >> n.x >> n.y >> n.z;
+			currentObject.normals.push_back(n);
+		}
+		else if (tag == "f") {
+			std::string tokens[4];
+			fin >> tokens[0] >> tokens[1] >> tokens[2] >> tokens[3];
+			for (auto token : tokens) {
+				std::vector<std::string> numbers = split(token, '/');
+				currentObject.vertexIndices.push_back(stoi(numbers[0]));
+				currentObject.textureIndices.push_back(stoi(numbers[1]));
+				currentObject.normalIndices.push_back(stoi(numbers[2]));
+			}
+			currentFaces++;
+		}
+		else {
+			continue;
+		}
+		if (currentBiggest) {
+			bestVertices = currentVertices;
+			bestFaces = currentFaces;
+		}
+	}
+	return std::make_tuple(bestVertices, bestFaces);
+}
+
+int main(int argc, char** argv) {
+
+	const auto results = tupleParser(argv[1]);
+	std::cout << "(" + std::to_string(std::get<0>(results)) + ", " + std::to_string(std::get<1>(results)) + ")";
+
+}
+```
+
+To test this out, I made a dummy OBJ file with 3 objects:
+- One with 4 vertices and 4 faces, like a triangle-base pyramid
+- One with 5 vertices and 5 faces, like a square-base pyramid
+- One with 8 vertices and 6 faces, like a cube
+
+<img width="332" height="783" alt="image" src="https://github.com/user-attachments/assets/9e2238dd-4328-478f-ae7c-095bc252b678" />
+
+The cube is the expected largest object, so the output should be (8, 6), which it was:
+
+<img width="391" height="84" alt="image" src="https://github.com/user-attachments/assets/586dc01d-68df-425b-bf7e-a1c858065b90" />
+
+## Exercise 4 - Span and Arrays
+
+### Q: Reimplement the program using the array template, which wraps a vanilla C array within a C++11 template.
+
+I don't have the pass the size of ```listOfValues``` in a separate parameter anymore, but I do still need to define the size of the array as part of the function's signature, i.e. ```std::array<int, size_t>``` was not acceptible as a valid signature for it:
+
+```c++
+int findLargestValueV1(std::array<int, 100> listOfValues)
+
+std::array<int, numOfValues> listOfValues;
+```
+
+<img width="351" height="100" alt="image" src="https://github.com/user-attachments/assets/c3b68e04-cdf6-413c-ad24-a05460954e04" />
+
+### Q: Reimplement it again to use C++20's ```span``` to pass the array into the function
+
+```std::span``` is a reference type with a size that does not have to be known at runtime. As a result, you can simply pass ```std::span<const int>``` to the function and it works exactly the same way as before without having to pass in the size of the array into the function:
+
+```c++
+int findLargestValueV1(std::span<const int> listOfValues)
+```
+
+<img width="319" height="90" alt="image" src="https://github.com/user-attachments/assets/dea681bc-e3fd-4c00-88e2-44b15b36ee6a" />
