@@ -294,7 +294,7 @@ Matrix33d transpose() const {
 
 ## Exercise 4 - Vector and Matrix Multiplication
 
-### Q: Expand the Matrix33d 
+### Q: Expand the Matrix33d to allow for multiplication by a Vector3d
 
 I wrote a multiply function in Matrix33d which takes a Vector3d as the rightmost operand and multiplies them together, returning a Vector3d as a result:
 
